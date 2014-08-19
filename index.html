@@ -1,0 +1,168 @@
+<!doctype html>
+<head>
+<meta charset="UTF-8" />
+
+	<link type="text/css" rel="stylesheet" href="rickshaw/src/css/graph.css">
+	<link type="text/css" rel="stylesheet" href="rickshaw/examples/css/lines.css">
+
+	<script src="rickshaw/vendor/d3.v2.js"></script>
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+
+	<script src="rickshaw/rickshaw.js"></script>
+<style>
+div.graph {
+
+	margin:auto;
+	border: 1px solid black;
+	width: 80%;
+	}
+
+div { width: 100%;
+	padding: 10px;
+	}
+
+body {
+	font-family: sans-serif;
+	font-size: 1em;
+	text-align: center;
+}
+</style>
+<title>Incredible Aqua Garden aquaponics metrics</title>
+</head>
+<body>
+<h1>Incredible Aqua Garden </h1>
+
+Real-time measurements from the <a href="http://incredibleaquagarden.co.uk/">Incredible Aqua Garden</a> 
+aquaponics project in Todmorden.
+
+<div id="chart_container">
+<br>
+	Light level (lux)
+	<div id="light" class="graph"></div>
+<br>
+	pH level
+	<div id="ph" class="graph"></div>
+<br>
+	Air (red) and water (green) temperature (&deg;C)
+	<div id="temp" class="graph"></div>
+</div>
+
+<script>
+var graph = new Rickshaw.Graph( {
+	element: document.querySelector('#light'),
+	series: [
+		{	
+			color: 'yellow',
+			data: [ ]
+		}
+		],
+	renderer: "line"
+});
+graph.render();
+var yAxis = new Rickshaw.Graph.Axis.Y({
+    graph: graph
+});
+
+yAxis.render();
+var phgraph = new Rickshaw.Graph( {
+	element: document.querySelector('#ph'),
+	series: [
+		{	
+			color: 'blue',
+			data: [ ]
+		}
+		],
+	renderer: "line"
+});
+phgraph.render();
+var phyAxis = new Rickshaw.Graph.Axis.Y({
+    graph: phgraph
+});
+
+phyAxis.render();
+
+var tempgraph = new Rickshaw.Graph( {
+	element: document.querySelector('#temp'),
+	series: [
+		{	
+			color: 'red',
+			data: [ ]
+		},
+		{
+			color: 'green',
+			data: []
+		}
+		],
+	renderer: "line"
+});
+tempgraph.render();
+var tempyAxis = new Rickshaw.Graph.Axis.Y({
+    graph: tempgraph
+});
+
+tempyAxis.render();
+
+var socket = new WebSocket("ws://incredibleaquagdn.no-ip.info:8008/ws/aquadata");
+
+var latency = 500;
+
+socket.onmessage = function(data) {
+		// take in the data and turn it into an array
+		parsed = JSON.parse(data.data);
+
+		// pick out special bits of data
+		ye = parseInt(parsed["Light"].trim()); 
+		yph = parseFloat(parsed["pH"].trim());
+		yairtemp = parseFloat(parsed["Air Temperature"].trim());
+		ywatertemp = parseFloat(parsed["Water Temperature"].trim());
+		ex = data.timeStamp;
+
+		// put data on lovely graphs
+		graph.series[0].data.push({x:ex, y:ye})
+		graph.series[0].data = graph.series[0].data.slice(graph.series[0].data.length - latency, graph.series[0].data.length);
+		graph.render();
+
+		phgraph.series[0].data.push({x:ex, y:yph});
+		phgraph.series[0].data = phgraph.series[0].data.slice(phgraph.series[0].data.length - latency, phgraph.series[0].data.length);
+		phgraph.render();
+		tempgraph.series[0].data.push({x:ex,y: yairtemp});
+		tempgraph.series[1].data.push({x:ex,y: ywatertemp});
+		tempgraph.series[0].data = tempgraph.series[0].data.slice(tempgraph.series[0].data.length - latency, tempgraph.series[0].data.length);
+		tempgraph.series[1].data = tempgraph.series[1].data.slice(tempgraph.series[1].data.length - latency, tempgraph.series[1].data.length);
+
+		tempgraph.render();
+	}
+
+
+//console.log('Hi there');
+
+//Rickshaw.Graph.Socketio.Static = Rickshaw.Class.create( Rickshaw.Graph.Socketio, {
+//	request: function() {
+//	  var socket = new WebSocket(this.dataURL);
+//	  thisData = this;
+//    socket.onmessage = function (data) {
+//      //console.log("Got some fancy Websocket data: ");
+//      console.log(data);
+//     thisData.success(data);
+//      //alert(data);
+//    }
+//	}
+//} );
+
+//var socketioGraph = new Rickshaw.Graph.Socketio.Static( {
+//	element: document.getElementById("chart"),
+//	width: 400,
+//	height: 200,
+//	renderer: 'line',
+//	dataURL: "ws://incredibleaquagdn.no-ip.info:8008/ws/aquadata",
+//	onData: function(d) { 
+//		console.log(points.data);
+//		Rickshaw.Series.zeroFill(points);
+//		return(points) }
+//} );
+
+</script>
+
+</body>
