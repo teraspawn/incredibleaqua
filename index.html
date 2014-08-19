@@ -8,20 +8,19 @@
 	<script src="rickshaw/vendor/d3.v2.js"></script>
 
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js"></script>
-  <script src="/socket.io/socket.io.js"></script>
 
 	<script src="rickshaw/rickshaw.js"></script>
 <style>
 div.graph {
-
 	margin:auto;
 	border: 1px solid black;
 	width: 80%;
-	}
+}
 
-div { width: 100%;
+div { 
+	width: 100%;
 	padding: 10px;
-	}
+}
 
 body {
 	font-family: sans-serif;
@@ -29,6 +28,7 @@ body {
 	text-align: center;
 }
 </style>
+
 <title>Incredible Aqua Garden aquaponics metrics</title>
 </head>
 <body>
@@ -136,32 +136,6 @@ socket.onmessage = function(data) {
 	}
 
 
-//console.log('Hi there');
-
-//Rickshaw.Graph.Socketio.Static = Rickshaw.Class.create( Rickshaw.Graph.Socketio, {
-//	request: function() {
-//	  var socket = new WebSocket(this.dataURL);
-//	  thisData = this;
-//    socket.onmessage = function (data) {
-//      //console.log("Got some fancy Websocket data: ");
-//      console.log(data);
-//     thisData.success(data);
-//      //alert(data);
-//    }
-//	}
-//} );
-
-//var socketioGraph = new Rickshaw.Graph.Socketio.Static( {
-//	element: document.getElementById("chart"),
-//	width: 400,
-//	height: 200,
-//	renderer: 'line',
-//	dataURL: "ws://incredibleaquagdn.no-ip.info:8008/ws/aquadata",
-//	onData: function(d) { 
-//		console.log(points.data);
-//		Rickshaw.Series.zeroFill(points);
-//		return(points) }
-//} );
 
 </script>
 
